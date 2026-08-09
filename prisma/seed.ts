@@ -93,6 +93,15 @@ async function main() {
     { r: 105, g: 221, b: 255 },
   ];
 
+  // Demo EXIF values so the lightbox metadata panel has something to render
+  // against these seed placeholder images — not real gear, just fixtures.
+  const demoExif = [
+    { camera: "Demo Camera X100", lens: "35mm f/1.4", aperture: "f/1.4", shutterSpeed: "1/250", iso: 100, focalLength: "35mm" },
+    { camera: "Demo Camera X100", lens: "50mm f/1.8", aperture: "f/2.8", shutterSpeed: "1/500", iso: 200, focalLength: "50mm" },
+    { camera: "Demo Camera X100", lens: "24-70mm f/2.8", aperture: "f/5.6", shutterSpeed: "1/125", iso: 400, focalLength: "70mm" },
+    { camera: "Demo Camera X100", lens: "85mm f/1.8", aperture: "f/1.8", shutterSpeed: "1/1000", iso: 100, focalLength: "85mm" },
+  ];
+
   for (const [index, color] of photoColors.entries()) {
     const media = await seedMedia(
       `seed/photo-${index + 1}.jpg`,
@@ -103,16 +112,18 @@ async function main() {
     const existingPhoto = await db.photo.findFirst({
       where: { albumId: album.id, mediaId: media.id },
     });
-    if (!existingPhoto) {
+    const photoData = {
+      caption: `Placeholder photo ${index + 1} — replace via the Phase 8 admin.`,
+      featured: true,
+      order: index,
+      published: true,
+      ...demoExif[index],
+    };
+    if (existingPhoto) {
+      await db.photo.update({ where: { id: existingPhoto.id }, data: photoData });
+    } else {
       await db.photo.create({
-        data: {
-          albumId: album.id,
-          mediaId: media.id,
-          caption: `Placeholder photo ${index + 1} — replace via the Phase 8 admin.`,
-          featured: true,
-          order: index,
-          published: true,
-        },
+        data: { albumId: album.id, mediaId: media.id, ...photoData },
       });
     }
   }

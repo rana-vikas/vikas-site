@@ -130,6 +130,25 @@ model Photo {
   order     Int        @default(0)
   published Boolean    @default(true)
   createdAt DateTime   @default(now())
+
+  // EXIF, shown in the lightbox metadata panel
+  camera       String?
+  lens         String?
+  aperture     String?
+  shutterSpeed String?
+  iso          Int?
+  focalLength  String?
+  takenAt      DateTime?
+}
+
+model Equipment {
+  id          String   @id @default(cuid())
+  name        String
+  category    String?
+  description String?  @db.Text
+  order       Int      @default(0)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
 }
 
 // Career
