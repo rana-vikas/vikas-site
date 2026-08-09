@@ -1,0 +1,22 @@
+{$DOMAIN} {
+	encode zstd gzip
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+
+	# Media (photos, resume, etc.) is proxied through the same domain rather
+	# than exposing MinIO's raw port to the internet — gives it TLS too,
+	# and needs only the one DNS record. STORAGE_PUBLIC_URL must be set to
+	# https://{$DOMAIN}/media to match.
+	handle /media/* {
+		uri strip_prefix /media
+		reverse_proxy minio:9000
+	}
+
+	handle {
+		reverse_proxy web:3000
+	}
+}

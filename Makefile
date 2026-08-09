@@ -1,6 +1,7 @@
 COMPOSE = docker compose -f docker/docker-compose.yml --env-file .env.local
+PROD_COMPOSE = docker compose -f docker/docker-compose.yml -f docker/docker-compose.prod.yml --env-file .env.local
 
-.PHONY: up down logs migrate seed backup test test-e2e
+.PHONY: up down logs migrate seed backup test test-e2e deploy prod-down prod-logs
 
 up:
 	$(COMPOSE) up -d --build
@@ -34,3 +35,18 @@ test-e2e:
 		-e PLAYWRIGHT_BASE_URL=http://web:3000 \
 		mcr.microsoft.com/playwright:v1.62.1-jammy \
 		npx playwright test --workers=1
+
+# Requires DOMAIN set in .env.local (see README "Going to production") and
+# port 80/443 forwarded to this server. Builds web, applies pending
+# migrations non-interactively (migrate deploy, not migrate dev), then
+# (re)starts everything including Caddy.
+deploy:
+	$(PROD_COMPOSE) build web
+	$(PROD_COMPOSE) --profile tools run --rm tools npx prisma migrate deploy
+	$(PROD_COMPOSE) up -d
+
+prod-down:
+	$(PROD_COMPOSE) down
+
+prod-logs:
+	$(PROD_COMPOSE) logs -f
