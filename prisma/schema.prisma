@@ -89,24 +89,52 @@ model Media {
   fitnessEntries      FitnessEntry[]
   cricketPlayerPhotos CricketPlayer[]
   cricketMemories     CricketMemory[]
+  travelMemories      TravelMemory[]
 }
 
 model TravelTrip {
-  id           String    @id @default(cuid())
-  slug         String    @unique
+  id           String           @id @default(cuid())
+  slug         String           @unique
   title        String
   location     String
-  summary      String?   @db.Text
+  summary      String?          @db.Text
   startDate    DateTime
   endDate      DateTime?
   coverMediaId String?
-  coverMedia   Media?    @relation(fields: [coverMediaId], references: [id])
-  published    Boolean   @default(false)
-  // Only one trip should be latest = true at a time; Phase 8's publish flow
-  // must unset the previous one when a new trip is marked latest.
-  latest       Boolean   @default(false)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  coverMedia   Media?           @relation(fields: [coverMediaId], references: [id])
+  published    Boolean          @default(false)
+  // Only one trip should be latest = true at a time — enforced by
+  // lib/travel/setLatestTrip.ts, which Phase 8's admin publish flow calls.
+  latest       Boolean          @default(false)
+  locations    TravelLocation[]
+  memories     TravelMemory[]
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+}
+
+model TravelLocation {
+  id          String     @id @default(cuid())
+  tripId      String
+  trip        TravelTrip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  name        String
+  description String?    @db.Text
+  latitude    Float?
+  longitude   Float?
+  order       Int        @default(0)
+  createdAt   DateTime   @default(now())
+}
+
+model TravelMemory {
+  id        String     @id @default(cuid())
+  tripId    String
+  trip      TravelTrip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  title     String
+  caption   String?    @db.Text
+  mediaId   String?
+  media     Media?     @relation(fields: [mediaId], references: [id])
+  order     Int        @default(0)
+  published Boolean    @default(true)
+  createdAt DateTime   @default(now())
 }
 
 model PhotoAlbum {

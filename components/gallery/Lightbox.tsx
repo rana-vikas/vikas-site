@@ -3,11 +3,26 @@
 import { useCallback, useEffect, useRef, type TouchEvent } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import type { GalleryPhoto } from "@/components/gallery/PhotoGallery";
+import type { Media } from "@/lib/generated/prisma/client";
 import { publicUrl } from "@/lib/storage/url";
 import { formatMonthYear } from "@/lib/utils/date";
 
 const SWIPE_THRESHOLD = 50;
+
+// Minimal shape the lightbox needs — decoupled from the Photo model so
+// other domains (e.g. Travel memories) can reuse it without EXIF fields.
+export type GalleryImage = {
+  id: string;
+  media: Media;
+  caption?: string | null;
+  camera?: string | null;
+  lens?: string | null;
+  aperture?: string | null;
+  shutterSpeed?: string | null;
+  iso?: number | null;
+  focalLength?: string | null;
+  takenAt?: Date | null;
+};
 
 export function Lightbox({
   photos,
@@ -15,7 +30,7 @@ export function Lightbox({
   onClose,
   onIndexChange,
 }: {
-  photos: GalleryPhoto[];
+  photos: GalleryImage[];
   index: number;
   onClose: () => void;
   onIndexChange: (index: number) => void;

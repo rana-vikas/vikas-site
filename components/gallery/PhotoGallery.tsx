@@ -3,13 +3,10 @@
 import { useState } from "react";
 import Image from "next/image";
 import { AnimatePresence } from "framer-motion";
-import type { Media, Photo } from "@/lib/generated/prisma/client";
 import { publicUrl } from "@/lib/storage/url";
-import { Lightbox } from "@/components/gallery/Lightbox";
+import { Lightbox, type GalleryImage } from "@/components/gallery/Lightbox";
 
-export type GalleryPhoto = Photo & { media: Media };
-
-export function PhotoGallery({ photos }: { photos: GalleryPhoto[] }) {
+export function PhotoGallery({ photos }: { photos: GalleryImage[] }) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   if (photos.length === 0) {
