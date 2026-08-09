@@ -46,3 +46,6 @@ next-env.d.ts
 
 # prisma generated client
 /lib/generated/
+
+# local backups (DB dumps, media mirror) — never commit real data
+/backups/

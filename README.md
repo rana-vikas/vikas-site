@@ -17,9 +17,11 @@ make down     # stop everything
 make logs     # follow logs
 make migrate  # run Prisma migrations (prompts for a name on schema changes)
 make seed     # run prisma/seed.ts (added in Phase 8)
-make backup   # pg_dump the db to backups/
-make test     # Vitest unit tests
-make test-e2e # Playwright E2E tests against the running site
+make backup       # gzipped pg_dump to backups/, prunes dumps older than 14 days
+make backup-media # mirrors the MinIO bucket to backups/minio-mirror/ (or $BACKUP_MEDIA_DIR)
+make backup-all   # both of the above — this is what runs nightly, see below
+make test         # Vitest unit tests
+make test-e2e     # Playwright E2E tests against the running site
 ```
 
 `make test-e2e` runs against whatever's currently live (`make up` must be
@@ -92,3 +94,53 @@ make prod-down  # stop the production stack
 fetching images via the public domain from inside the same Docker network
 it's running on — the same hairpin-NAT problem as before, not something
 Caddy or TLS resolves on its own. Left as-is.
+
+## Backups
+
+`make backup-all` runs nightly at 2:15am via this server's crontab
+(`crontab -l` to see it, `crontab -e` to change or remove it — it was
+appended, not replacing anything already there). Output logs to
+`backups/backup.log`.
+
+- **Database**: gzipped `pg_dump`, timestamped, in `backups/`. Dumps older
+  than 14 days are pruned automatically on each run.
+- **Media**: `mc mirror` (no `--remove`, so it only adds/updates — a file
+  deleted from the live bucket stays recoverable in the backup instead of
+  the backup silently losing it too) into `backups/minio-mirror/`.
+
+**Both currently write to this same server's disk** — a real backup needs
+to live somewhere that survives *this machine* failing. Point
+`BACKUP_MEDIA_DIR` (env var, read by `make backup-media`/`backup-all`) at
+an external disk or a mounted off-site/network location once you have one,
+e.g.:
+```
+BACKUP_MEDIA_DIR=/mnt/backup-disk/vikas-site/minio-mirror make backup-all
+```
+For the database dump, the simplest off-site step is syncing `backups/*.sql.gz`
+itself (e.g. `rsync -av backups/ user@remote:/path/` or a cloud sync tool) —
+not built into `make backup` since it depends on wherever you decide to send it.
+
+### Cloud migration runbook
+
+Everything above is Postgres + an S3-compatible bucket behind generic env
+vars — moving off this server never needs code changes, only new `.env`
+values (per PLAN.md §1's "golden rule"). Steps, if/when you migrate:
+
+1. **Database**: provision a managed Postgres (Neon, Supabase, RDS, etc.),
+   then `pg_restore` (or `psql < backups/db-<latest>.sql.gz` after
+   `gunzip`) the most recent dump into it.
+2. **Media**: provision an S3-compatible bucket (Cloudflare R2, AWS S3,
+   Backblaze B2), then `mc mirror backups/minio-mirror/ remote-alias/bucket-name`
+   (or mirror directly from the live MinIO bucket instead of the backup, if
+   it's still running) to copy everything over.
+3. **Update `.env`**: change `DATABASE_URL` to the new managed Postgres
+   connection string, and `STORAGE_ENDPOINT`/`STORAGE_PUBLIC_URL`/
+   `STORAGE_ACCESS_KEY`/`STORAGE_SECRET_KEY`/`STORAGE_BUCKET` to the new
+   provider's values. No application code changes — `lib/storage/` only
+   ever talks to the S3-compatible API via these env vars.
+4. **Redeploy**: point the `web` container (or a platform like Vercel, if
+   moving off containers entirely) at the new env and redeploy. `db`/`minio`
+   containers are no longer needed once the managed services are live.
+5. **Cut over DNS**: repoint the domain's A record (or `CNAME`, depending on
+   the new host) at the new deployment; remove the old server once you've
+   confirmed the new one is serving correctly.
