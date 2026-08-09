@@ -5,8 +5,9 @@ import { ExperienceTimeline } from "@/components/career/ExperienceTimeline";
 import { SkillsSection } from "@/components/career/SkillsSection";
 import { ProjectsGrid } from "@/components/career/ProjectsGrid";
 import { CredentialsSection } from "@/components/career/CredentialsSection";
-import { RecruiterSection, type Stat } from "@/components/career/RecruiterSection";
+import { RecruiterSection } from "@/components/career/RecruiterSection";
 import { FadeIn } from "@/components/animations/FadeIn";
+import type { Stat } from "@/components/ui/StatsGrid";
 
 /* eslint-disable react-hooks/purity -- Server Component: this whole module
    runs once per request, not subject to client re-render replay, so the

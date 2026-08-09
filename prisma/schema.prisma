@@ -82,10 +82,11 @@ model Media {
   alt       String?
   createdAt DateTime @default(now())
 
-  travelCovers  TravelTrip[]
-  photos        Photo[]
-  profiles      Profile[]
-  projectCovers Project[]
+  travelCovers   TravelTrip[]
+  photos         Photo[]
+  profiles       Profile[]
+  projectCovers  Project[]
+  fitnessEntries FitnessEntry[]
 }
 
 model TravelTrip {
@@ -188,6 +189,56 @@ model Certification {
   issuer    String
   date      DateTime?
   url       String?
+  order     Int       @default(0)
+  published Boolean   @default(true)
+  createdAt DateTime  @default(now())
+}
+
+// Fitness
+
+model FitnessJourney {
+  id        String   @id @default(cuid())
+  startYear Int
+  story     String?  @db.Text
+  updatedAt DateTime @updatedAt
+}
+
+model FitnessChallenge {
+  id         String         @id @default(cuid())
+  slug       String         @unique
+  title      String
+  lengthDays Int
+  summary    String?        @db.Text
+  startDate  DateTime?
+  endDate    DateTime?
+  published  Boolean        @default(false)
+  entries    FitnessEntry[]
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+}
+
+model FitnessEntry {
+  id          String           @id @default(cuid())
+  challengeId String
+  challenge   FitnessChallenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  dayNumber   Int
+  date        DateTime?
+  title       String?
+  notes       String?          @db.Text
+  mediaId     String?
+  media       Media?           @relation(fields: [mediaId], references: [id])
+  published   Boolean          @default(true)
+  createdAt   DateTime         @default(now())
+
+  @@unique([challengeId, dayNumber])
+}
+
+model Competition {
+  id        String    @id @default(cuid())
+  name      String
+  result    String?
+  location  String?
+  date      DateTime?
   order     Int       @default(0)
   published Boolean   @default(true)
   createdAt DateTime  @default(now())

@@ -117,6 +117,47 @@ async function main() {
     }
   }
 
+  // Real facts from PLAN.md §6 — not placeholder content. Narrative, exact
+  // dates, and day-by-day entries are left for the Phase 8 admin since only
+  // these bare facts were provided.
+  const existingJourney = await db.fitnessJourney.findFirst();
+  if (!existingJourney) {
+    await db.fitnessJourney.create({ data: { startYear: 2021 } });
+  }
+
+  await db.competition.upsert({
+    where: { id: "seed-icn-goa-2024" },
+    update: {},
+    create: {
+      id: "seed-icn-goa-2024",
+      name: "ICN Goa 2024",
+      result: "Bronze",
+      published: true,
+    },
+  });
+
+  await db.fitnessChallenge.upsert({
+    where: { slug: "100-day" },
+    update: {},
+    create: {
+      slug: "100-day",
+      title: "100-Day Challenge",
+      lengthDays: 100,
+      published: true,
+    },
+  });
+
+  await db.fitnessChallenge.upsert({
+    where: { slug: "365-day" },
+    update: {},
+    create: {
+      slug: "365-day",
+      title: "365-Day Challenge",
+      lengthDays: 365,
+      published: true,
+    },
+  });
+
   console.log("Seed complete.");
 }
 
