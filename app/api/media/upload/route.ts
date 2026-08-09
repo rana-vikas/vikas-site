@@ -5,10 +5,9 @@ import sharp from "sharp";
 import { requireAdminSession } from "@/lib/auth/session";
 import { db } from "@/lib/db";
 import { storageClient, STORAGE_BUCKET } from "@/lib/storage/client";
+import { ALLOWED_IMAGE_TYPES, uploadSchema } from "@/lib/validations/media";
 
 const MAX_DIMENSION = 2400;
-const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
-const ALLOWED_DOCUMENT_TYPES = new Set(["application/pdf"]);
 
 export async function POST(request: Request) {
   const session = await requireAdminSession();
@@ -17,23 +16,20 @@ export async function POST(request: Request) {
   }
 
   const formData = await request.formData();
-  const file = formData.get("file");
-  const alt = formData.get("alt");
+  const parsed = uploadSchema.safeParse({
+    file: formData.get("file"),
+    alt: formData.get("alt") || undefined,
+  });
 
-  if (!(file instanceof File)) {
-    return NextResponse.json({ error: "No file provided" }, { status: 400 });
-  }
-
-  const isImage = ALLOWED_IMAGE_TYPES.has(file.type);
-  const isDocument = ALLOWED_DOCUMENT_TYPES.has(file.type);
-
-  if (!isImage && !isDocument) {
+  if (!parsed.success) {
     return NextResponse.json(
-      { error: "Only JPEG, PNG, WebP images or PDF documents are supported" },
+      { error: parsed.error.issues[0]?.message ?? "Invalid upload" },
       { status: 400 },
     );
   }
 
+  const { file, alt } = parsed.data;
+  const isImage = ALLOWED_IMAGE_TYPES.has(file.type);
   const inputBuffer = Buffer.from(await file.arrayBuffer());
 
   let key: string;
@@ -87,13 +83,7 @@ export async function POST(request: Request) {
   }
 
   const media = await db.media.create({
-    data: {
-      key,
-      type,
-      width,
-      height,
-      alt: typeof alt === "string" && alt.length > 0 ? alt : null,
-    },
+    data: { key, type, width, height, alt: alt ?? null },
   });
 
   return NextResponse.json(media);

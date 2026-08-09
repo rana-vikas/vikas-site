@@ -3,6 +3,11 @@ import bcrypt from "bcryptjs";
 import type { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { db } from "@/lib/db";
+import { rateLimit } from "@/lib/rateLimit";
+import { credentialsSchema } from "@/lib/validations/auth";
+
+const LOGIN_ATTEMPT_LIMIT = 5;
+const LOGIN_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 
 export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(db),
@@ -20,14 +25,27 @@ export const authOptions: AuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null;
+        const parsed = credentialsSchema.safeParse(credentials);
+        if (!parsed.success) return null;
+
+        // Keyed by the submitted email, not IP — there's exactly one valid
+        // admin account, so this bounds brute-force attempts against it
+        // regardless of how many source IPs an attacker rotates through
+        // (unlike IP-based limiting, which isn't trustworthy pre-Phase 12
+        // reverse proxy — see lib/net.ts).
+        const { allowed } = rateLimit(
+          `login:${parsed.data.email}`,
+          LOGIN_ATTEMPT_LIMIT,
+          LOGIN_WINDOW_MS,
+        );
+        if (!allowed) return null;
 
         const user = await db.user.findUnique({
-          where: { email: credentials.email },
+          where: { email: parsed.data.email },
         });
         if (!user?.password) return null;
 
-        const valid = await bcrypt.compare(credentials.password, user.password);
+        const valid = await bcrypt.compare(parsed.data.password, user.password);
         if (!valid) return null;
 
         return {
