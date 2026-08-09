@@ -1,9 +1,16 @@
 import { db } from "@/lib/db";
 import { FadeIn } from "@/components/animations/FadeIn";
 import { ChallengeCard } from "@/components/fitness/ChallengeCard";
+import { pageMetadata } from "@/lib/seo/metadata";
 
 // Renders at request time — see app/(public)/page.tsx for why.
 export const dynamic = "force-dynamic";
+
+export const metadata = pageMetadata({
+  title: "Challenges",
+  description: "100-day and 365-day fitness challenges, logged day by day.",
+  path: "/fitness/challenges",
+});
 
 export default async function FitnessChallengesPage() {
   const challenges = await db.fitnessChallenge.findMany({

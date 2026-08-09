@@ -1,13 +1,33 @@
+import { cache } from "react";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { FadeIn } from "@/components/animations/FadeIn";
 import { EntryList } from "@/components/fitness/EntryList";
 import { Pagination } from "@/components/ui/Pagination";
+import { pageMetadata } from "@/lib/seo/metadata";
 
 // Renders at request time — see app/(public)/page.tsx for why.
 export const dynamic = "force-dynamic";
 
 const ENTRIES_PER_PAGE = 30;
+
+const getChallenge = cache((slug: string) =>
+  db.fitnessChallenge.findUnique({ where: { slug, published: true } }),
+);
+
+export async function generateMetadata(
+  props: PageProps<"/fitness/challenges/[challengeSlug]">,
+) {
+  const { challengeSlug } = await props.params;
+  const challenge = await getChallenge(challengeSlug);
+  if (!challenge) return {};
+
+  return pageMetadata({
+    title: challenge.title,
+    description: challenge.summary ?? undefined,
+    path: `/fitness/challenges/${challenge.slug}`,
+  });
+}
 
 export default async function ChallengePage(
   props: PageProps<"/fitness/challenges/[challengeSlug]">,
@@ -16,9 +36,7 @@ export default async function ChallengePage(
   const { page: pageParam } = await props.searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
 
-  const challenge = await db.fitnessChallenge.findUnique({
-    where: { slug: challengeSlug, published: true },
-  });
+  const challenge = await getChallenge(challengeSlug);
 
   if (!challenge) {
     notFound();

@@ -5,9 +5,16 @@ import { StatsGrid, type Stat } from "@/components/ui/StatsGrid";
 import { CompetitionsList } from "@/components/fitness/CompetitionsList";
 import { ChallengeCard } from "@/components/fitness/ChallengeCard";
 import { ReachOutCta } from "@/components/fitness/ReachOutCta";
+import { pageMetadata } from "@/lib/seo/metadata";
 
 // Renders at request time — see app/(public)/page.tsx for why.
 export const dynamic = "force-dynamic";
+
+export const metadata = pageMetadata({
+  title: "Fitness",
+  description: "The fitness journey — competitions, challenges, and progress.",
+  path: "/fitness",
+});
 
 export default async function FitnessPage() {
   const [journey, competitions, challenges] = await Promise.all([

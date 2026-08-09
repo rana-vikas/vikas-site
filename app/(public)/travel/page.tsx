@@ -1,9 +1,16 @@
 import { db } from "@/lib/db";
 import { FadeIn } from "@/components/animations/FadeIn";
 import { TripCard } from "@/components/travel/TripCard";
+import { pageMetadata } from "@/lib/seo/metadata";
 
 // Renders at request time — see app/(public)/page.tsx for why.
 export const dynamic = "force-dynamic";
+
+export const metadata = pageMetadata({
+  title: "Travel",
+  description: "Trip archive — itineraries, galleries, and maps.",
+  path: "/travel",
+});
 
 export default async function TravelPage() {
   const trips = await db.travelTrip.findMany({

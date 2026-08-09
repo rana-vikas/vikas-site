@@ -5,9 +5,16 @@ import { PlayersGrid } from "@/components/cricket/PlayersGrid";
 import { MatchesTimeline } from "@/components/cricket/MatchesTimeline";
 import { TournamentsList } from "@/components/cricket/TournamentsList";
 import { MemoriesGallery } from "@/components/cricket/MemoriesGallery";
+import { pageMetadata } from "@/lib/seo/metadata";
 
 // Renders at request time — see app/(public)/page.tsx for why.
 export const dynamic = "force-dynamic";
+
+export const metadata = pageMetadata({
+  title: "Cricket",
+  description: "Indus Knights — players, matches, tournaments, and memories.",
+  path: "/cricket",
+});
 
 export default async function CricketPage() {
   const [team, players, matches, tournaments, memories] = await Promise.all([

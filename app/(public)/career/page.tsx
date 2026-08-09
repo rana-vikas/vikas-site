@@ -8,6 +8,7 @@ import { CredentialsSection } from "@/components/career/CredentialsSection";
 import { RecruiterSection } from "@/components/career/RecruiterSection";
 import { FadeIn } from "@/components/animations/FadeIn";
 import type { Stat } from "@/components/ui/StatsGrid";
+import { pageMetadata } from "@/lib/seo/metadata";
 
 /* eslint-disable react-hooks/purity -- Server Component: this whole module
    runs once per request, not subject to client re-render replay, so the
@@ -15,6 +16,12 @@ import type { Stat } from "@/components/ui/StatsGrid";
 
 // Renders at request time — see app/(public)/page.tsx for why.
 export const dynamic = "force-dynamic";
+
+export const metadata = pageMetadata({
+  title: "Career",
+  description: "Professional summary, experience, projects, and a recruiter view.",
+  path: "/career",
+});
 
 const YEAR_MS = 1000 * 60 * 60 * 24 * 365;
 

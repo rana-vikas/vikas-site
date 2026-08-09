@@ -2,9 +2,16 @@ import { db } from "@/lib/db";
 import { FadeIn } from "@/components/animations/FadeIn";
 import { EquipmentList } from "@/components/photography/EquipmentList";
 import { PhotoGallery } from "@/components/gallery/PhotoGallery";
+import { pageMetadata } from "@/lib/seo/metadata";
 
 // Renders at request time — see app/(public)/page.tsx for why.
 export const dynamic = "force-dynamic";
+
+export const metadata = pageMetadata({
+  title: "Photography",
+  description: "Equipment and photo albums.",
+  path: "/photography",
+});
 
 export default async function PhotographyPage() {
   const [equipment, albums] = await Promise.all([

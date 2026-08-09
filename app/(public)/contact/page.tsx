@@ -1,5 +1,12 @@
 import { FadeIn } from "@/components/animations/FadeIn";
 import { ContactForm } from "@/components/contact/ContactForm";
+import { pageMetadata } from "@/lib/seo/metadata";
+
+export const metadata = pageMetadata({
+  title: "Contact",
+  description: "Get in touch.",
+  path: "/contact",
+});
 
 export default function ContactPage() {
   return (
