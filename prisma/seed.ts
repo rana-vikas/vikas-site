@@ -1,4 +1,5 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
+import bcrypt from "bcryptjs";
 import sharp from "sharp";
 import { db } from "../lib/db";
 import { storageClient, STORAGE_BUCKET } from "../lib/storage/client";
@@ -47,6 +48,26 @@ async function seedMedia(key: string, color: { r: number; g: number; b: number }
 }
 
 async function main() {
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  if (adminEmail && adminPassword) {
+    const passwordHash = await bcrypt.hash(adminPassword, 12);
+    await db.user.upsert({
+      where: { email: adminEmail },
+      update: { password: passwordHash },
+      create: {
+        email: adminEmail,
+        password: passwordHash,
+        name: "Vikas Rana",
+        role: "admin",
+      },
+    });
+  } else {
+    console.warn(
+      "Skipping admin user: ADMIN_EMAIL and/or ADMIN_PASSWORD not set.",
+    );
+  }
+
   const existingProfile = await db.profile.findFirst();
   if (!existingProfile) {
     await db.profile.create({

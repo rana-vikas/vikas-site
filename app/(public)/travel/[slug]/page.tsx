@@ -56,9 +56,11 @@ export default async function TripPage(
           </h1>
           <p className="mt-2 text-muted">{trip.location}</p>
           {trip.summary && (
-            <p className="mt-6 max-w-2xl text-lg text-muted">
-              {trip.summary}
-            </p>
+            // Admin-authored (Tiptap) HTML — trusted content, not user input.
+            <div
+              className="mt-6 max-w-2xl text-lg text-muted [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_h2]:text-2xl [&_h2]:font-medium [&_h2]:text-foreground"
+              dangerouslySetInnerHTML={{ __html: trip.summary }}
+            />
           )}
         </FadeIn>
       </section>

@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { mainNav } from "@/config/navigation";
 import { siteConfig } from "@/config/site";
+import { getAdminSession } from "@/lib/auth/session";
 
-export function Nav() {
+export async function Nav() {
+  const session = await getAdminSession();
+
   return (
     <header className="border-b border-white/10">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
@@ -19,6 +22,14 @@ export function Nav() {
               {item.label}
             </Link>
           ))}
+          {session?.user && (
+            <Link
+              href="/admin"
+              className="transition-colors hover:text-foreground"
+            >
+              Admin
+            </Link>
+          )}
         </nav>
       </div>
     </header>
