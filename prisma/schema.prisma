@@ -60,12 +60,14 @@ model VerificationToken {
 // Site content
 
 model Profile {
-  id        String   @id @default(cuid())
-  name      String
-  headline  String
-  tagline   String
-  summary   String?  @db.Text
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(cuid())
+  name          String
+  headline      String
+  tagline       String
+  summary       String?  @db.Text
+  resumeMediaId String?
+  resumeMedia   Media?   @relation(fields: [resumeMediaId], references: [id])
+  updatedAt     DateTime @updatedAt
 }
 
 // Central file registry — every stored file (photo, video, resume) is a Media
@@ -80,26 +82,28 @@ model Media {
   alt       String?
   createdAt DateTime @default(now())
 
-  travelCovers TravelTrip[]
-  photos       Photo[]
+  travelCovers  TravelTrip[]
+  photos        Photo[]
+  profiles      Profile[]
+  projectCovers Project[]
 }
 
 model TravelTrip {
-  id            String    @id @default(cuid())
-  slug          String    @unique
-  title         String
-  location      String
-  summary       String?   @db.Text
-  startDate     DateTime
-  endDate       DateTime?
-  coverMediaId  String?
-  coverMedia    Media?    @relation(fields: [coverMediaId], references: [id])
-  published     Boolean   @default(false)
+  id           String    @id @default(cuid())
+  slug         String    @unique
+  title        String
+  location     String
+  summary      String?   @db.Text
+  startDate    DateTime
+  endDate      DateTime?
+  coverMediaId String?
+  coverMedia   Media?    @relation(fields: [coverMediaId], references: [id])
+  published    Boolean   @default(false)
   // Only one trip should be latest = true at a time; Phase 8's publish flow
   // must unset the previous one when a new trip is marked latest.
-  latest        Boolean   @default(false)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  latest       Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }
 
 model PhotoAlbum {
@@ -123,4 +127,68 @@ model Photo {
   order     Int        @default(0)
   published Boolean    @default(true)
   createdAt DateTime   @default(now())
+}
+
+// Career
+
+model Experience {
+  id          String    @id @default(cuid())
+  company     String
+  title       String
+  location    String?
+  startDate   DateTime
+  endDate     DateTime?
+  current     Boolean   @default(false)
+  description String?   @db.Text
+  order       Int       @default(0)
+  published   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Skill {
+  id        String   @id @default(cuid())
+  name      String
+  category  String
+  order     Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Project {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  title        String
+  summary      String
+  description  String?  @db.Text
+  url          String?
+  repoUrl      String?
+  coverMediaId String?
+  coverMedia   Media?   @relation(fields: [coverMediaId], references: [id])
+  featured     Boolean  @default(false)
+  published    Boolean  @default(false)
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Achievement {
+  id          String    @id @default(cuid())
+  title       String
+  description String?   @db.Text
+  date        DateTime?
+  order       Int       @default(0)
+  published   Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+}
+
+model Certification {
+  id        String    @id @default(cuid())
+  title     String
+  issuer    String
+  date      DateTime?
+  url       String?
+  order     Int       @default(0)
+  published Boolean   @default(true)
+  createdAt DateTime  @default(now())
 }
