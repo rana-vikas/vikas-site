@@ -37,12 +37,12 @@ export default async function AdminDashboardPage() {
     { label: "Photos", count: photoCount, href: "/admin/photography" },
     { label: "Equipment", count: equipmentCount, href: "/admin/photography" },
     { label: "Media files", count: mediaCount, href: "/admin/media" },
-    { label: "Experience entries", count: experienceCount },
-    { label: "Projects", count: projectCount },
-    { label: "Fitness challenges", count: fitnessChallengeCount },
-    { label: "Competitions", count: competitionCount },
-    { label: "Cricket players", count: cricketPlayerCount },
-    { label: "Cricket matches", count: cricketMatchCount },
+    { label: "Experience entries", count: experienceCount, href: "/admin/career" },
+    { label: "Projects", count: projectCount, href: "/admin/career" },
+    { label: "Fitness challenges", count: fitnessChallengeCount, href: "/admin/fitness" },
+    { label: "Competitions", count: competitionCount, href: "/admin/fitness" },
+    { label: "Cricket players", count: cricketPlayerCount, href: "/admin/cricket" },
+    { label: "Cricket matches", count: cricketMatchCount, href: "/admin/cricket" },
   ];
 
   return (
@@ -70,9 +70,8 @@ export default async function AdminDashboardPage() {
         })}
       </div>
       <p className="mt-8 text-sm text-muted">
-        Career, Fitness, and Cricket CRUD screens aren&apos;t built yet —
-        counts are shown for visibility. Travel, Photography, Media, and
-        Settings are manageable now.
+        Every content domain is manageable now: Career, Fitness, Cricket,
+        Travel, Photography, Media, and Settings.
       </p>
     </div>
   );

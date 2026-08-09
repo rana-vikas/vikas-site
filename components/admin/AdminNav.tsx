@@ -3,6 +3,9 @@ import { SignOutButton } from "@/components/admin/SignOutButton";
 
 const adminNav = [
   { label: "Dashboard", href: "/admin" },
+  { label: "Career", href: "/admin/career" },
+  { label: "Fitness", href: "/admin/fitness" },
+  { label: "Cricket", href: "/admin/cricket" },
   { label: "Travel", href: "/admin/travel" },
   { label: "Photography", href: "/admin/photography" },
   { label: "Media", href: "/admin/media" },
