@@ -1,5 +1,9 @@
 # vikas-site
 
+![Status](https://img.shields.io/badge/status-LAN--only-yellow)
+![Stack](https://img.shields.io/badge/Next.js-16-black)
+![License](https://img.shields.io/badge/license-private-lightgrey)
+
 Self-hosted personal site. Runs entirely in Docker Compose on this server; see
 `PLAN.md` for the full build plan and architecture rationale.
 
