@@ -33,7 +33,6 @@ export function ContactForm() {
       }
 
       setStatus("sent");
-      event.currentTarget.reset();
     } catch (err) {
       setStatus("error");
       setError(err instanceof Error ? err.message : "Something went wrong.");

@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useRef, useState } from "react";
 import type { ActionState } from "@/lib/actions/types";
 import type { PhotoAlbum } from "@/lib/generated/prisma/client";
+import { slugify } from "@/lib/utils/slug";
 
 export function AlbumForm({
   album,
@@ -12,6 +13,8 @@ export function AlbumForm({
   action: (prevState: ActionState, formData: FormData) => Promise<ActionState>;
 }) {
   const [state, formAction, pending] = useActionState(action, {});
+  const [slug, setSlug] = useState(album?.slug ?? "");
+  const slugTouched = useRef(Boolean(album?.slug));
 
   return (
     <form action={formAction} className="max-w-md space-y-4">
@@ -24,6 +27,9 @@ export function AlbumForm({
           name="title"
           defaultValue={album?.title}
           required
+          onChange={(event) => {
+            if (!slugTouched.current) setSlug(slugify(event.target.value));
+          }}
           className="mt-1 w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-foreground outline-none focus:border-cyan/40"
         />
       </div>
@@ -34,7 +40,11 @@ export function AlbumForm({
         <input
           id="slug"
           name="slug"
-          defaultValue={album?.slug}
+          value={slug}
+          onChange={(event) => {
+            slugTouched.current = true;
+            setSlug(event.target.value);
+          }}
           required
           pattern="[a-z0-9]+(-[a-z0-9]+)*"
           className="mt-1 w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-foreground outline-none focus:border-cyan/40"
