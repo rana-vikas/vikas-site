@@ -82,11 +82,13 @@ model Media {
   alt       String?
   createdAt DateTime @default(now())
 
-  travelCovers   TravelTrip[]
-  photos         Photo[]
-  profiles       Profile[]
-  projectCovers  Project[]
-  fitnessEntries FitnessEntry[]
+  travelCovers        TravelTrip[]
+  photos              Photo[]
+  profiles            Profile[]
+  projectCovers       Project[]
+  fitnessEntries      FitnessEntry[]
+  cricketPlayerPhotos CricketPlayer[]
+  cricketMemories     CricketMemory[]
 }
 
 model TravelTrip {
@@ -238,6 +240,66 @@ model Competition {
   name      String
   result    String?
   location  String?
+  date      DateTime?
+  order     Int       @default(0)
+  published Boolean   @default(true)
+  createdAt DateTime  @default(now())
+}
+
+// Cricket
+
+model CricketTeam {
+  id          String   @id @default(cuid())
+  name        String
+  foundedYear Int
+  tagline     String?
+  story       String?  @db.Text
+  updatedAt   DateTime @updatedAt
+}
+
+model CricketPlayer {
+  id           String   @id @default(cuid())
+  name         String
+  role         String?
+  bio          String?  @db.Text
+  photoMediaId String?
+  photoMedia   Media?   @relation(fields: [photoMediaId], references: [id])
+  order        Int      @default(0)
+  published    Boolean  @default(true)
+  createdAt    DateTime @default(now())
+}
+
+model Tournament {
+  id        String         @id @default(cuid())
+  name      String
+  location  String?
+  startDate DateTime?
+  endDate   DateTime?
+  result    String?
+  order     Int            @default(0)
+  published Boolean        @default(true)
+  createdAt DateTime       @default(now())
+  matches   CricketMatch[]
+}
+
+model CricketMatch {
+  id           String      @id @default(cuid())
+  opponent     String
+  matchDate    DateTime
+  result       String?
+  summary      String?     @db.Text
+  tournamentId String?
+  tournament   Tournament? @relation(fields: [tournamentId], references: [id])
+  published    Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+}
+
+model CricketMemory {
+  id        String    @id @default(cuid())
+  title     String
+  caption   String?   @db.Text
+  mediaId   String?
+  media     Media?    @relation(fields: [mediaId], references: [id])
   date      DateTime?
   order     Int       @default(0)
   published Boolean   @default(true)

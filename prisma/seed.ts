@@ -158,6 +158,23 @@ async function main() {
     },
   });
 
+  // Real facts from PLAN.md §6 — not placeholder content. The story paragraph
+  // is assembled only from facts stated there (2015 founding, US origin,
+  // Gurgaon weekend cricket, "friends became family"); no players, matches,
+  // tournaments, or memories are invented since none were given.
+  const existingTeam = await db.cricketTeam.findFirst();
+  if (!existingTeam) {
+    await db.cricketTeam.create({
+      data: {
+        name: "Indus Knights",
+        foundedYear: 2015,
+        tagline: "Friends became family.",
+        story:
+          "Indus Knights got its start in 2015, born out of a group of friends with roots in the US. What began as casual weekend cricket in Gurgaon turned into something bigger — friends became family.",
+      },
+    });
+  }
+
   console.log("Seed complete.");
 }
 
