@@ -56,3 +56,71 @@ model VerificationToken {
 
   @@unique([identifier, token])
 }
+
+// Site content
+
+model Profile {
+  id        String   @id @default(cuid())
+  name      String
+  headline  String
+  tagline   String
+  summary   String?  @db.Text
+  updatedAt DateTime @updatedAt
+}
+
+// Central file registry — every stored file (photo, video, resume) is a Media
+// row referencing an object key in the S3-compatible bucket (MinIO now, R2/S3
+// later). Content models reference Media instead of storing raw URLs.
+model Media {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  type      String
+  width     Int?
+  height    Int?
+  alt       String?
+  createdAt DateTime @default(now())
+
+  travelCovers TravelTrip[]
+  photos       Photo[]
+}
+
+model TravelTrip {
+  id            String    @id @default(cuid())
+  slug          String    @unique
+  title         String
+  location      String
+  summary       String?   @db.Text
+  startDate     DateTime
+  endDate       DateTime?
+  coverMediaId  String?
+  coverMedia    Media?    @relation(fields: [coverMediaId], references: [id])
+  published     Boolean   @default(false)
+  // Only one trip should be latest = true at a time; Phase 8's publish flow
+  // must unset the previous one when a new trip is marked latest.
+  latest        Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model PhotoAlbum {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  published Boolean  @default(false)
+  photos    Photo[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Photo {
+  id        String     @id @default(cuid())
+  albumId   String
+  album     PhotoAlbum @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  mediaId   String
+  media     Media      @relation(fields: [mediaId], references: [id])
+  caption   String?
+  featured  Boolean    @default(false)
+  order     Int        @default(0)
+  published Boolean    @default(true)
+  createdAt DateTime   @default(now())
+}

@@ -1,16 +1,40 @@
-export default function Home() {
+import { db } from "@/lib/db";
+
+// Renders at request time — content is Prisma-backed and will change via the
+// Phase 8 admin, so a database connection isn't available (or meaningful) to
+// statically prerender this page at build time.
+export const dynamic = "force-dynamic";
+import { Hero } from "@/components/hero/Hero";
+import { WorldsGrid } from "@/components/cards/WorldsGrid";
+import { LatestTravelSection } from "@/components/travel/LatestTravelSection";
+import { PhotographyTeaser } from "@/components/photography/PhotographyTeaser";
+import { RecruiterPanel } from "@/components/career/RecruiterPanel";
+
+export default async function Home() {
+  const [profile, latestTrip, featuredPhotos] = await Promise.all([
+    db.profile.findFirst(),
+    db.travelTrip.findFirst({
+      where: { latest: true, published: true },
+      include: { coverMedia: true },
+    }),
+    db.photo.findMany({
+      where: { featured: true, published: true },
+      orderBy: { order: "asc" },
+      take: 4,
+      include: { media: true },
+    }),
+  ]);
+
   return (
-    <div className="mx-auto flex max-w-5xl flex-col items-start gap-4 px-6 py-32">
-      <p className="text-sm uppercase tracking-widest text-muted">
-        Phase 1 — Foundation
-      </p>
-      <h1 className="bg-gradient-to-r from-cyan to-purple bg-clip-text text-5xl font-semibold tracking-tight text-transparent">
-        Vikas Rana
-      </h1>
-      <p className="max-w-xl text-muted">
-        Next.js, Tailwind, Postgres, and MinIO are wired up and running in
-        Docker. This placeholder confirms the stack works end to end.
-      </p>
-    </div>
+    <>
+      <Hero
+        headline={profile?.headline ?? "Vikas Rana"}
+        tagline={profile?.tagline ?? "Different Worlds. One Person."}
+      />
+      <WorldsGrid />
+      <LatestTravelSection trip={latestTrip} />
+      <PhotographyTeaser photos={featuredPhotos} />
+      <RecruiterPanel />
+    </>
   );
 }

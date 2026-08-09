@@ -46,6 +46,7 @@ services:
       /bin/sh -c "
       mc alias set local http://minio:9000 ${STORAGE_ACCESS_KEY} ${STORAGE_SECRET_KEY} &&
       (mc mb -p local/${STORAGE_BUCKET} || true) &&
+      mc anonymous set download local/${STORAGE_BUCKET} &&
       exit 0
       "
 
