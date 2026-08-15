@@ -1,6 +1,7 @@
 # vikas-site
 
 ![Status](https://img.shields.io/badge/status-LAN--only-yellow)
+![Visibility](https://img.shields.io/badge/repo-public-brightgreen)
 ![Stack](https://img.shields.io/badge/Next.js-16-black)
 ![License](https://img.shields.io/badge/license-private-lightgrey)
 
