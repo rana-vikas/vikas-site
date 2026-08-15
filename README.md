@@ -5,7 +5,9 @@
 ![License](https://img.shields.io/badge/license-private-lightgrey)
 
 Self-hosted personal site. Runs entirely in Docker Compose on this server; see
-`PLAN.md` for the full build plan and architecture rationale.
+`PLAN.md` for the full build plan and architecture rationale, and
+[`docs/architecture.md`](docs/architecture.md) for system and data-flow
+diagrams.
 
 ## Dev access
 
