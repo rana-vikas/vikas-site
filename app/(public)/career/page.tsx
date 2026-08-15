@@ -74,10 +74,16 @@ export default async function CareerPage() {
   }
 
   const resumeUrl = profile?.resumeMedia ? publicUrl(profile.resumeMedia.key) : null;
+  const currentExperience = experiences.find((experience) => experience.current) ?? experiences[0];
 
   return (
     <>
-      <ProfessionalSummary summary={profile?.summary ?? null} />
+      <ProfessionalSummary
+        name={profile?.name ?? null}
+        title={currentExperience?.title ?? null}
+        location={currentExperience?.location ?? null}
+        summary={profile?.summary ?? null}
+      />
 
       <section className="mx-auto max-w-5xl px-6 py-16">
         <FadeIn>

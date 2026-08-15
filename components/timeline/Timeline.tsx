@@ -21,9 +21,21 @@ export function Timeline({ items }: { items: TimelineItem[] }) {
             {item.title}
           </h3>
           {item.subtitle && <p className="text-sm text-muted">{item.subtitle}</p>}
-          {item.description && (
-            <p className="mt-2 text-sm text-muted">{item.description}</p>
-          )}
+          {item.description && (() => {
+            const lines = item.description
+              .split("\n")
+              .map((line) => line.trim())
+              .filter(Boolean);
+            return lines.length > 1 ? (
+              <ul className="mt-2 list-disc space-y-1 pl-4 text-sm text-muted marker:text-cyan/60">
+                {lines.map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-2 text-sm text-muted">{lines[0]}</p>
+            );
+          })()}
         </FadeIn>
       ))}
     </div>

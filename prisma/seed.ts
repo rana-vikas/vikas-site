@@ -80,6 +80,256 @@ async function main() {
     });
   }
 
+  // Real career content, sourced verbatim from Website_Career_Content.md
+  // (the user's own pre-filtered, public-safe career record). Unlike the
+  // placeholders above, this is real biographical content the user supplied
+  // — see vikas-site-content-policy memory for why placeholder facts are
+  // never invented but real supplied facts are seeded directly.
+  const CAREER_SUMMARY = [
+    "19+ years in technology, 18 of them in healthcare-tech — building reliable systems and leading AI-enabled automation for enterprise-scale operations.",
+    'Senior technology professional with 19+ years of experience spanning software engineering, production operations, Site Reliability Engineering (SRE), automation, and enterprise platform delivery. Currently leads AI-enabled operational transformation for a large healthcare technology organization — driving application stability and resiliency programs, change-governance automation, incident intelligence, and GenAI-powered operational tooling.',
+    'Career path has moved from hands-on mainframe development, through technical/project leadership and service ownership, into SRE and automation leadership — with a consistent thread of taking systems from "working" to "reliable, observable, and self-improving." Recognized in 2025 with an organization-wide Impact Award for leading AI-led transformation initiatives.',
+  ].join("\n\n");
+
+  const placeholderSummary = "Placeholder profile summary — replace via the Phase 8 admin.";
+  const profileForSummary = existingProfile ?? (await db.profile.findFirst());
+  if (profileForSummary && (profileForSummary.summary === placeholderSummary || !profileForSummary.summary)) {
+    await db.profile.update({
+      where: { id: profileForSummary.id },
+      data: { summary: CAREER_SUMMARY },
+    });
+  }
+
+  const careerExperiences = [
+    {
+      company: "Optum / UnitedHealth Group",
+      title: "Senior Software Engineer II | SRE & Automation Lead",
+      location: "Gurugram, India",
+      startDate: "2022-12-01",
+      endDate: null as string | null,
+      current: true,
+      description: [
+        "Application stability, availability, and resiliency programs, including peak-season and disaster-recovery readiness",
+        "End-to-end high-priority incident coordination and problem-management follow-through",
+        "Production change governance, including AI-assisted change-risk review",
+        "Design and delivery of enterprise GenAI-enabled tooling for change risk, incident intelligence/reporting, and operational assistance",
+        "Ownership of an enterprise endpoint performance-monitoring application",
+        "Automation-first delivery using Python and Microsoft Power Automate",
+        "Impact Award winner (2025) for leading AI-driven transformation of technology operations",
+      ].join("\n"),
+    },
+    {
+      company: "Optum / UnitedHealth Group",
+      title: "Service Level Owner — Public-Health Reporting Platform",
+      location: "Gurugram, India",
+      startDate: "2022-02-01",
+      endDate: "2022-11-01",
+      current: false,
+      description:
+        "Owned reliability and 24x7 production support for a state public-health COVID-19 data reporting and analytics platform.",
+    },
+    {
+      company: "Optum / UnitedHealth Group",
+      title: "Technical Lead — Provider & Network Data Platform",
+      location: "Gurugram, India",
+      startDate: "2019-04-01",
+      endDate: "2022-02-01",
+      current: false,
+      description:
+        "Led delivery of a provider-information and network-management system (credentialing, contracts, fee schedules), owning release delivery, sprint planning, and production support.",
+    },
+    {
+      company: "Optum / UnitedHealth Group",
+      title: "Technical Lead / Scrum Master — Policy Administration Platform",
+      location: "Gurugram, India",
+      startDate: "2017-12-01",
+      endDate: "2019-04-01",
+      current: false,
+      description:
+        "Led an offshore delivery team building policy-management functionality; ran Scrum ceremonies and production-change/RCA processes.",
+    },
+    {
+      company: "Optum / UnitedHealth Group",
+      title: "Project Lead — Claims Payment & Member Billing Systems",
+      location: "Gurugram, India",
+      startDate: "2008-08-01",
+      endDate: "2017-12-01",
+      current: false,
+      description:
+        "Progressed from Onsite Service Coordinator to Project Lead across claims-payment processing, provider payment/remittance, and member billing systems.",
+    },
+    {
+      company: "NIIT Technologies (now Coforge)",
+      title: "Developer",
+      location: null as string | null,
+      startDate: "2007-01-01",
+      endDate: "2008-08-01",
+      current: false,
+      description:
+        "Delivered mainframe applications for U.S. insurance and banking clients, including loan-processing and insurance policy-administration platforms.",
+    },
+  ];
+
+  for (const [index, experience] of careerExperiences.entries()) {
+    const existing = await db.experience.findFirst({
+      where: { company: experience.company, title: experience.title },
+    });
+    const data = {
+      company: experience.company,
+      title: experience.title,
+      location: experience.location,
+      startDate: new Date(experience.startDate),
+      endDate: experience.endDate ? new Date(experience.endDate) : null,
+      current: experience.current,
+      description: experience.description,
+      published: true,
+      order: index,
+    };
+    if (existing) {
+      await db.experience.update({ where: { id: existing.id }, data });
+    } else {
+      await db.experience.create({ data });
+    }
+  }
+
+  const careerSkills: { category: string; name: string }[] = [
+    { category: "Reliability & Operations", name: "Site Reliability Engineering" },
+    { category: "Reliability & Operations", name: "Incident/problem/change management" },
+    { category: "Reliability & Operations", name: "Root-cause analysis" },
+    { category: "Reliability & Operations", name: "Disaster-recovery readiness" },
+    { category: "Reliability & Operations", name: "Monitoring & observability" },
+    { category: "Reliability & Operations", name: "24x7 production support" },
+    { category: "AI & Automation", name: "GenAI-assisted tooling" },
+    { category: "AI & Automation", name: "LLM prompting" },
+    { category: "AI & Automation", name: "Intelligent workflow automation" },
+    { category: "AI & Automation", name: "Microsoft Power Automate" },
+    { category: "AI & Automation", name: "Python automation" },
+    { category: "Engineering", name: "Python (FastAPI)" },
+    { category: "Engineering", name: "React" },
+    { category: "Engineering", name: "Docker" },
+    { category: "Engineering", name: "Linux/RHEL" },
+    { category: "Engineering", name: "SQL" },
+    { category: "Engineering", name: "Mainframe (COBOL, JCL, DB2, VSAM, CICS, IMS)" },
+    { category: "Leadership", name: "Technical/project leadership" },
+    { category: "Leadership", name: "Scrum Master" },
+    { category: "Leadership", name: "Service ownership" },
+    { category: "Leadership", name: "Cross-functional coordination" },
+    { category: "Domains", name: "Healthcare claims & payments" },
+    { category: "Domains", name: "Provider & policy administration" },
+    { category: "Domains", name: "Public-health reporting" },
+    { category: "Domains", name: "Insurance/banking systems" },
+  ];
+
+  for (const [index, skill] of careerSkills.entries()) {
+    const existing = await db.skill.findFirst({
+      where: { name: skill.name, category: skill.category },
+    });
+    if (existing) {
+      await db.skill.update({ where: { id: existing.id }, data: { order: index, published: true } });
+    } else {
+      await db.skill.create({ data: { ...skill, order: index, published: true } });
+    }
+  }
+
+  const featuredWork = [
+    {
+      slug: "ai-assisted-change-governance",
+      title: "AI-Assisted Change Governance",
+      summary:
+        "An enterprise platform that reviews production change requests for approval-readiness and risk, using GenAI to summarize risk factors and flag quality gaps before human review.",
+    },
+    {
+      slug: "incident-intelligence-reporting",
+      title: "Incident Intelligence & Reporting",
+      summary:
+        'A GenAI-powered platform that summarizes and reports on high-priority incident "war rooms" in real time, cutting down manual reporting effort during live incidents.',
+    },
+    {
+      slug: "operational-genai-assistant",
+      title: "Operational GenAI Assistant",
+      summary:
+        "A chatbot-style assistant that lets operations teams query incident and change data conversationally instead of digging through dashboards.",
+    },
+    {
+      slug: "application-stability-resiliency-program",
+      title: "Application Stability & Resiliency Program",
+      summary:
+        "An enterprise-wide assessment program that evaluates applications for operational readiness — monitoring, disaster-recovery, and reliability gaps — across a large application portfolio.",
+    },
+    {
+      slug: "ai-driven-war-room-reliability-intelligence",
+      title: "AI-Driven War Room & Reliability Intelligence",
+      summary:
+        "An integrated initiative connecting incident, chat, and change data into a single reliability picture for leadership visibility.",
+    },
+    {
+      slug: "endpoint-performance-monitoring",
+      title: "Endpoint Performance Monitoring",
+      summary:
+        "An application that continuously checks the health and performance of a large fleet of user-facing machines and alerts when something needs attention.",
+    },
+  ];
+
+  for (const [index, project] of featuredWork.entries()) {
+    await db.project.upsert({
+      where: { slug: project.slug },
+      update: { title: project.title, summary: project.summary, featured: true, published: true },
+      create: {
+        slug: project.slug,
+        title: project.title,
+        summary: project.summary,
+        featured: true,
+        published: true,
+        order: index,
+      },
+    });
+  }
+
+  const existingAchievement = await db.achievement.findFirst({
+    where: { title: "Impact Award — Winner (2025)" },
+  });
+  if (!existingAchievement) {
+    await db.achievement.create({
+      data: {
+        title: "Impact Award — Winner (2025)",
+        description:
+          "Individual, business-line-level recognition for leading AI-driven transformation of technology operations.",
+        order: 0,
+        published: true,
+      },
+    });
+  }
+
+  const educationAndCertifications = [
+    {
+      title: "Master of Computer Applications (MCA)",
+      issuer: "Guru Jambheshwar University of Science & Technology, Hisar",
+    },
+    { title: "Bachelor of Computer Applications (BCA)", issuer: "Kurukshetra University, Kurukshetra" },
+    { title: "Microsoft Certified: Azure Fundamentals (AZ-900)", issuer: "Microsoft" },
+    { title: "ITIL v3 Foundation", issuer: "Certification" },
+    { title: "AHM-250 — Healthcare Management", issuer: "Certification" },
+    { title: "Claims SME — Level 2", issuer: "Optum / UnitedHealth Group" },
+    {
+      title: "Generative AI / Machine Learning / Advanced AI Topics — internal AI enablement program",
+      issuer: "Optum / UnitedHealth Group",
+    },
+  ];
+
+  for (const [index, entry] of educationAndCertifications.entries()) {
+    const existing = await db.certification.findFirst({ where: { title: entry.title } });
+    if (existing) {
+      await db.certification.update({
+        where: { id: existing.id },
+        data: { issuer: entry.issuer, order: index, published: true },
+      });
+    } else {
+      await db.certification.create({
+        data: { title: entry.title, issuer: entry.issuer, order: index, published: true },
+      });
+    }
+  }
+
   const travelCover = await seedMedia(
     "seed/travel-cover.jpg",
     { r: 105, g: 221, b: 255 },
