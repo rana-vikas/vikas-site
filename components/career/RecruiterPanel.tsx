@@ -3,23 +3,23 @@ import { FadeIn } from "@/components/animations/FadeIn";
 
 export function RecruiterPanel() {
   return (
-    <section className="mx-auto max-w-5xl px-6 py-24">
+    <section className="mx-auto max-w-[1200px] px-[18px] py-24 sm:px-8 lg:px-12 lg:py-32">
       <FadeIn>
-        <div className="flex flex-col items-start gap-4 rounded-2xl border border-white/10 bg-gradient-to-r from-cyan/10 to-purple/10 p-8 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-xl font-medium text-foreground">
-              Hiring? Start here.
-            </h2>
-            <p className="mt-1 text-sm text-muted">
-              A recruiter-focused view with stats, timeline, and a resume
-              download.
-            </p>
-          </div>
+        <div className="relative overflow-hidden rounded-[28px] border border-border bg-panel px-8 py-14 text-center sm:px-16">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -top-1/2 left-1/2 h-[400px] w-[600px] -translate-x-1/2 rounded-full bg-gradient-to-r from-cyan/10 to-purple/10 blur-[100px]"
+          />
+          <p className="relative font-semibold leading-[0.95] tracking-[-0.03em] text-foreground text-[clamp(28px,4vw,44px)]">
+            Looking for the
+            <br />
+            professional story?
+          </p>
           <Link
             href="/career#recruiter"
-            className="shrink-0 rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+            className="relative mt-8 inline-flex h-[46px] items-center rounded-full border border-white/[.12] bg-white/[.04] px-6 text-sm font-medium text-foreground transition-all duration-300 hover:-translate-y-0.5 hover:border-border-hover hover:bg-white/[.07] hover:shadow-[0_0_24px_rgba(105,221,255,0.25)]"
           >
-            Recruiter view
+            View Recruiter Profile →
           </Link>
         </div>
       </FadeIn>

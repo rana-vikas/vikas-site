@@ -3,46 +3,60 @@ import Link from "next/link";
 import type { Media, TravelTrip } from "@/lib/generated/prisma/client";
 import { publicUrl } from "@/lib/storage/url";
 import { FadeIn } from "@/components/animations/FadeIn";
+import { RevealImage } from "@/components/travel/RevealImage";
 
 type LatestTrip = TravelTrip & { coverMedia: Media | null };
 
 export function LatestTravelSection({ trip }: { trip: LatestTrip | null }) {
   return (
-    <section className="mx-auto max-w-5xl px-6 py-24">
+    <section className="mx-auto max-w-[1200px] px-[18px] py-24 sm:px-8 lg:px-12 lg:py-32">
       <FadeIn>
-        <h2 className="text-sm uppercase tracking-widest text-muted">
-          Latest Travel
-        </h2>
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-foreground-secondary">
+          Latest Journey
+        </p>
       </FadeIn>
+
       {trip ? (
-        <FadeIn delay={0.1}>
-          <Link
-            href={`/travel/${trip.slug}`}
-            className="group mt-8 grid gap-6 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] sm:grid-cols-2"
-          >
+        <div className="mt-10 grid gap-8 lg:grid-cols-[58%_1fr] lg:items-center lg:gap-12">
+          <RevealImage>
             {trip.coverMedia && (
-              <div className="relative aspect-video sm:aspect-auto">
+              <Link
+                href={`/travel/${trip.slug}`}
+                className="relative block aspect-[4/3] overflow-hidden rounded-[28px] border border-border bg-panel lg:aspect-[16/11]"
+              >
                 <Image
                   src={publicUrl(trip.coverMedia.key)}
                   alt={trip.coverMedia.alt ?? trip.title}
                   fill
                   unoptimized
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
-                  sizes="(min-width: 640px) 50vw, 100vw"
+                  loading="lazy"
+                  className="object-cover"
+                  sizes="(min-width: 1024px) 58vw, 100vw"
                 />
-              </div>
+              </Link>
             )}
-            <div className="flex flex-col justify-center p-6">
-              <h3 className="text-2xl font-medium text-foreground">
-                {trip.title}
-              </h3>
-              <p className="mt-1 text-sm text-muted">{trip.location}</p>
-              {trip.summary && (
-                <p className="mt-4 text-sm text-muted">{trip.summary}</p>
-              )}
-            </div>
-          </Link>
-        </FadeIn>
+          </RevealImage>
+
+          <FadeIn delay={0.15}>
+            <h2 className="font-semibold leading-[0.95] tracking-[-0.045em] text-foreground text-[clamp(32px,4vw,52px)]">
+              {trip.title}
+            </h2>
+            <p className="mt-3 text-sm uppercase tracking-[0.1em] text-muted">
+              {trip.location} · {trip.startDate.getFullYear()}
+            </p>
+            {trip.summary && (
+              <p className="mt-6 max-w-[560px] text-base leading-relaxed text-foreground-secondary">
+                {trip.summary}
+              </p>
+            )}
+            <Link
+              href="/travel"
+              className="mt-8 inline-flex items-center gap-1.5 text-sm font-medium text-cyan transition-colors hover:text-foreground"
+            >
+              Explore all travel stories →
+            </Link>
+          </FadeIn>
+        </div>
       ) : (
         <FadeIn delay={0.1}>
           <p className="mt-8 text-sm text-muted">No trips published yet.</p>

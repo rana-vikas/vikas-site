@@ -9,7 +9,7 @@ export default function AdminDashboardLayout({
   return (
     <div>
       <AdminNav />
-      <main className="mx-auto max-w-5xl px-6 py-12">{children}</main>
+      <main className="mx-auto max-w-5xl px-6 pb-12 pt-20">{children}</main>
     </div>
   );
 }

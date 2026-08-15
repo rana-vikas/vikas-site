@@ -9,10 +9,27 @@ import { WorldsGrid } from "@/components/cards/WorldsGrid";
 import { LatestTravelSection } from "@/components/travel/LatestTravelSection";
 import { PhotographyTeaser } from "@/components/photography/PhotographyTeaser";
 import { RecruiterPanel } from "@/components/career/RecruiterPanel";
+import { ScrollProgress } from "@/components/effects/ScrollProgress";
+import { Grain } from "@/components/effects/Grain";
+import { pageMetadata } from "@/lib/seo/metadata";
+
+const HOME_TITLE = "Vikas Rana — Engineer, Creator, Cricketer & Fitness Enthusiast";
+
+export const metadata = {
+  ...pageMetadata({
+    title: HOME_TITLE,
+    description:
+      "Career, fitness, cricket, photography, and travel — the different worlds of one person.",
+    path: "/",
+  }),
+  // Bypass the root layout's `%s | Vikas Rana` template — this title is
+  // already fully branded, so applying the template would stutter into
+  // "...Fitness Enthusiast | Vikas Rana".
+  title: { absolute: HOME_TITLE },
+};
 
 export default async function Home() {
-  const [profile, latestTrip, featuredPhotos] = await Promise.all([
-    db.profile.findFirst(),
+  const [latestTrip, featuredPhotos] = await Promise.all([
     db.travelTrip.findFirst({
       where: { latest: true, published: true },
       include: { coverMedia: true },
@@ -27,10 +44,9 @@ export default async function Home() {
 
   return (
     <>
-      <Hero
-        headline={profile?.headline ?? "Vikas Rana"}
-        tagline={profile?.tagline ?? "Different Worlds. One Person."}
-      />
+      <ScrollProgress />
+      <Grain />
+      <Hero />
       <WorldsGrid />
       <LatestTravelSection trip={latestTrip} />
       <PhotographyTeaser photos={featuredPhotos} />
